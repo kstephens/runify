@@ -7,7 +7,7 @@ module RubyUnify
       data = convert_parse_tree data
       pattern = convert_parse_tree pattern
 
-      RubyUnify::Pattern.match?(data, pattern, result)
+      Pattern.match?(data, pattern, result)
     end
 
     def match_and_unify data, pattern, template, result = nil
@@ -26,7 +26,7 @@ module RubyUnify
           Array === (e1 = expr[1]) &&
           e1[0] == :vcall &&
           expr[2] == :_?
-        RubyUnify::Pattern::Variable[e1[1]]
+        Pattern::Variable[e1[1]]
       else
         expr.map{|x| convert_parse_tree(x)}
       end
@@ -44,6 +44,7 @@ rp.match?("x", "x")
 rp.match?("x", "y._?")
 rp.match?("x + x", "y._? + y._?")
 rp.match?("x + y", "y._? + y._?")
+rp.match?("x += 1", "x._?")
 
 rp.match_and_unify("x + x", "x._? + x._?", "x._? * 2")
 
