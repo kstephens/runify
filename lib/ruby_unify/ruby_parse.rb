@@ -1,3 +1,5 @@
+require 'ruby_unify/pattern'
+
 gem 'ParseTree'
 require 'parse_tree'
 
@@ -22,11 +24,31 @@ module RubyUnify
       expr = ::ParseTree.translate(expr) if String === expr
 
       return expr unless Array === expr
-      if expr[0] == :call &&
+      case
+
+        # x._? 
+        #   =>
+        # [:call, [:vcall, x], :_?]
+      when expr[0] == :call &&
           Array === (e1 = expr[1]) &&
           e1[0] == :vcall &&
           expr[2] == :_?
         Pattern::Variable[e1[1]]
+
+        # FIXME:!!!
+        #
+        # def f(x => :_?, ...)
+        #   =>
+        # [:defn, :foo, [:scope, [:block, [:args, x, ..., [:block, [:lasgn, x, [:lit, :_?]]] ]]]
+
+      when expr[0] == :scope &&
+          Array === (e1 = expr[1]) &&
+          e1[0] == :block &&
+          Array === (e11 = e1[1]) &&
+          e11[0] == :args &&
+          expr[2] == :_?
+        Pattern::Variable[e1[1]]
+
       else
         expr.map{|x| convert_parse_tree(x)}
       end
@@ -37,14 +59,4 @@ module RubyUnify
 
 end
 
-
-rp = RubyUnify::RubyParse
-
-rp.match?("x", "x")
-rp.match?("x", "y._?")
-rp.match?("x + x", "y._? + y._?")
-rp.match?("x + y", "y._? + y._?")
-rp.match?("x += 1", "x._?")
-
-rp.match_and_unify("x + x", "x._? + x._?", "x._? * 2")
 

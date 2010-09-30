@@ -4,7 +4,7 @@ module RubyUnify
       result ||= Result.new
       _match?(data, pattern, result)
       result = result.match? && result
-      $stderr.puts "  match(#{data.inspect}, #{pattern.inspect}) => #{result.inspect}"
+      # $stderr.puts "  match(#{data.inspect}, #{pattern.inspect}) => #{result.inspect}" if $DEBUG
       result
     end
 
@@ -13,8 +13,8 @@ module RubyUnify
 
       case pattern
       when Variable
-        if result.has?(pattern)
-          x = result.get(pattern)
+        if result.key?(pattern)
+          x = result[pattern]
           unless _equal?(data, x)
             return result.no_match!
           end
@@ -22,19 +22,29 @@ module RubyUnify
           result.capture!(pattern, data)
         end
       else
-        return result if data.object_id == pattern.object_id
-
         unless data.class == pattern.class
           return result.no_match!
         end
 
         case data
         when Array
+          return result if data.object_id == pattern.object_id
           unless data.size == pattern.size
             return result.no_match!
           end
           data.each_with_index do | x, i |
-            return unless _match?(x, pattern[i], result)
+            return result.no_match! unless _match?(x, pattern[i], result)
+          end
+        when Hash
+          return result if data.object_id == pattern.object_id
+          unless data.size == pattern.size
+            return result.no_match!
+          end
+          data.each do | xk, xv |
+            if pattern.key?(xk)
+              yv = pattern[xk]
+              return result.no_match! unless _match?(xv, yv, result)
+            end
           end
         else
           unless data == pattern
@@ -47,13 +57,25 @@ module RubyUnify
     end
 
     def _equal?(x, y)
-      return true if x.object_id == y.object_id
       x.class == y.class and
         case x
         when Array
+          return true if x.object_id == y.object_id
           return false unless x.size == y.size
           x.each_with_index do | a, i | 
             return false unless _equal?(a, y[i])
+          end
+          true
+        when Hash
+          return true if x.object_id == y.object_id
+          return false unless x.size == y.size
+          x.each do | xk, xv |
+            if y.key?(xk)
+              yv = y[xk]
+              return false unless _equal?(xv, yv)
+            else
+              return false
+            end
           end
           true
         else
@@ -88,6 +110,10 @@ module RubyUnify
         @match = true
       end
 
+      def to_ary
+        [ @match, @h ]
+      end
+
       def match?
         @match
       end
@@ -96,17 +122,17 @@ module RubyUnify
         @match = false
       end
 
-      def has? x
+      def key? x
         @h.key?(x)
       end
 
       def capture! x, y
-        $stderr.puts "    capture! #{x.inspect} => #{y.inspect}"
+        # $stderr.puts "    capture! #{x.inspect} => #{y.inspect}" if $DEBUG
         @h[x] = y
         self
       end
 
-      def get x
+      def [](x)
         @h[x]
       end
 
@@ -128,7 +154,7 @@ module RubyUnify
       else
         result = [ false, data ]
       end
-      $stderr.puts "  match_and_unify(#{data.inspect}, #{pattern.inspect}, #{transform.inspect}) => #{result.inspect}"
+      # $stderr.puts "  match_and_unify(#{data.inspect}, #{pattern.inspect}, #{transform.inspect}) => #{result.inspect}" if $DEBUG
       result
     end
 
@@ -137,8 +163,8 @@ module RubyUnify
       when Array
         input.map { | x | unify(x, result) }
       else
-        if result.has?(input)
-          result.get(input)
+        if result.key?(input)
+          result[input]
         else
           input
         end
@@ -151,34 +177,3 @@ module RubyUnify
 end
 
 
-if false
-
-pm = RubyUnify::Pattern
-ru = RubyUnify::Unify
-v = RubyUnify::Pattern::Variable
-
-pm.match?(nil, nil)
-pm.match?(1, 1)
-pm.match?(1, 2)
-pm.match?([ ], [ ])
-pm.match?([ ], nil)
-pm.match?(nil, [ ])
-pm.match?([ 1 ], [ 1 ])
-pm.match?([ 1 ], [ 2 ])
-pm.match?([ 1, 2 ], [ 1 ])
-pm.match?([ 1 ],    [ 1, 2 ])
-
-pm.match?(nil, v[:x])
-pm.match?(1, v[:x])
-pm.match?(v[:x], v[:x])
-
-pm.match?([ 1, 2 ], v[:x])
-pm.match?([ 1, 1 ], [ v[:x], 1 ])
-pm.match?([ 1, 1 ], [ 1, v[:x] ])
-pm.match?([ 1, 1 ], [ 1, v[:x] ])
-pm.match?([ 1, 1 ], [ v[:x], v[:x] ])
-pm.match?([ 1, 2 ], [ v[:x], v[:x] ])
-
-ru.match_and_unify(1, v[:x], [ 2, v[:x]])
-
-end
