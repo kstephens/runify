@@ -38,6 +38,7 @@ describe "RubyUnify::Pattern" do
     pm.match?({ }, nil).should == false
     pm.match?(nil, { }).should == false
     pm.match?({ :a => 1 }, { :a => 1 }).to_ary.first.should == true
+    pm.match?({ :a => 1 }, [ :a, :b ]).should == false
     pm.match?({ :a => 1 }, { :a => 1, :b => 2 }).should == false
     pm.match?({ :a => 1 }, { :a => 1, :b => 2 }).should == false
     pm.match?({ :b => 2, :a => 1 }, { :a => 1, :b => 2 }).to_ary.first.should == true

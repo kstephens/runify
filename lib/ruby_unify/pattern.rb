@@ -164,9 +164,9 @@ module RubyUnify
         input.map { | x | unify(x, result) }
       when Hash
         hash = { }
-        input.each { | k, v | 
+        input.each do | k, v | 
           hash[unify(k, result)] = unify(v, result)
-        }
+        end
         hash
       else
         if result.key?(input)
