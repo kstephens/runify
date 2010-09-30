@@ -58,6 +58,7 @@ describe "RubyUnify::Pattern" do
   it "should handle basic pattern unification." do    
     ru.match_and_unify(1, v[:x], [ 2, v[:x]]).to_ary.should == [ true, [ 2, 1 ] ]
     ru.match_and_unify([ 1, 2 ], [ v[:x], v[:x] ], [ 2, v[:x]]).to_ary.should == [ false, [ 1, 2 ] ]
+    ru.match_and_unify([ 1, 2 ], [ v[:x], v[:y] ], { v[:x] => v[:y], :b => 2 }).to_ary.should == [true, {1=>2, :b=>2}]
   end
 
 end

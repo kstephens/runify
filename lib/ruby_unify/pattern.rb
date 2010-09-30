@@ -162,6 +162,12 @@ module RubyUnify
       case input
       when Array
         input.map { | x | unify(x, result) }
+      when Hash
+        hash = { }
+        input.each { | k, v | 
+          hash[unify(k, result)] = unify(v, result)
+        }
+        hash
       else
         if result.key?(input)
           result[input]
