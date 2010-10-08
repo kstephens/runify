@@ -1,5 +1,5 @@
 module RubyUnify
-  module Pattern
+  class Pattern
     def match?(data, pattern, result = nil)
       result ||= Result.new
       _match?(data, pattern, result)
@@ -83,7 +83,6 @@ module RubyUnify
         end
     end
 
-    extend self
 
     class Variable
       def initialize n, inspect = nil
@@ -103,6 +102,7 @@ module RubyUnify
         @inspect || super
       end
     end
+
 
     class Result
       def initialize h = nil, insp = nil
@@ -146,15 +146,22 @@ module RubyUnify
     end
   end
 
-  module Unify
-    def match_and_unify data, pattern, transform, result = nil
-      result = Pattern.match?(data, pattern)
+  class Unify
+    attr_accessor :pattern
+
+    def pattern
+      @pattern ||=
+        Pattern.new
+    end
+
+    def match_and_unify data, pat, transform, result = nil
+      result = pattern.match?(data, pat)
       if result
         result = [ true, unify(transform, result) ]
       else
         result = [ false, data ]
       end
-      # $stderr.puts "  match_and_unify(#{data.inspect}, #{pattern.inspect}, #{transform.inspect}) => #{result.inspect}" if $DEBUG
+      # $stderr.puts "  match_and_unify(#{data.inspect}, #{pat.inspect}, #{transform.inspect}) => #{result.inspect}" if $DEBUG
       result
     end
 
@@ -177,7 +184,6 @@ module RubyUnify
       end
     end
 
-    extend self
   end
 
 end

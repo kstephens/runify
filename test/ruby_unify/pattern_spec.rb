@@ -4,8 +4,8 @@ describe "RubyUnify::Pattern" do
   attr_accessor :pm, :ru, :v
 
   before(:each) do 
-    self.pm = RubyUnify::Pattern
-    self.ru = RubyUnify::Unify 
+    self.pm = RubyUnify::Pattern.new
+    self.ru = RubyUnify::Unify.new
     self.v = RubyUnify::Pattern::Variable
  end
 

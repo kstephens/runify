@@ -4,7 +4,7 @@ describe "RubyUnify::RubyParse" do
   attr_accessor :rp, :v
 
   before(:each) do 
-    self.rp = RubyUnify::RubyParse
+    self.rp = RubyUnify::RubyParse.new
     self.v = RubyUnify::Pattern::Variable
   end
 

@@ -4,20 +4,36 @@ gem 'ParseTree'
 require 'parse_tree'
 
 module RubyUnify
-  module RubyParse
-    def match? data, pattern, result = nil
-      data = convert_parse_tree data
-      pattern = convert_parse_tree pattern
+  class RubyParse
+    attr_accessor :pattern, :unify
 
-      Pattern.match?(data, pattern, result)
+    def pattern
+      @pattern ||=
+        Pattern.new
     end
 
-    def match_and_unify data, pattern, template, result = nil
+    def unify
+      @unify ||=
+        begin
+          obj = Unify.new
+          obj.pattern = pattern
+          obj
+        end
+    end
+
+    def match? data, pat, result = nil
       data = convert_parse_tree data
-      pattern = convert_parse_tree pattern
+      pat = convert_parse_tree pat
+
+      pattern.match?(data, pat, result)
+    end
+
+    def match_and_unify data, pat, template, result = nil
+      data = convert_parse_tree data
+      pat = convert_parse_tree pat
       template = convert_parse_tree template
 
-      Unify.match_and_unify(data, pattern, template, result)
+      unify.match_and_unify(data, pat, template, result)
     end
 
     def convert_parse_tree expr
@@ -54,7 +70,6 @@ module RubyUnify
       end
     end
 
-    extend self
   end
 
 end
