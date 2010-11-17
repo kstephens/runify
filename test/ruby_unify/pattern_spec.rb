@@ -56,6 +56,13 @@ describe "RubyUnify::Pattern" do
     pm.match?([ 1, 2 ], [ v[:x], v[:x] ]).should == false
   end
 
+  it "should handle direct or indirect variable binding lookups." do
+    m = pm.match?(5, v[:x])
+    m.should_not == nil
+    m[v[:x]].should == 5
+    m[:x].should == 5
+  end
+
   it "should handle basic pattern unification." do    
     ru.match_and_unify(1, v[:x], [ 2, v[:x]]).to_ary.should == [ true, [ 2, 1 ] ]
     ru.match_and_unify([ 1, 2 ], [ v[:x], v[:x] ], [ 2, v[:x]]).to_ary.should == [ false, [ 1, 2 ] ]
