@@ -47,9 +47,8 @@ describe "RubyUnify::Pattern::P" do
   end
 
   it "should handle basic variable matching." do
-
     case 5
-    when v(:x)
+    when p(v(:x))
       m.class.should == RubyUnify::Pattern::Result
       r = m[:x]
     else
