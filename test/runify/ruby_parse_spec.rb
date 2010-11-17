@@ -1,11 +1,11 @@
-require 'ruby_unify/ruby_parse'
+require 'runify/ruby_parse'
 
-describe "RubyUnify::RubyParse" do
+describe "Runify::RubyParse" do
   attr_accessor :rp, :v
 
   before(:each) do 
-    self.rp = RubyUnify::RubyParse.new
-    self.v = RubyUnify::Pattern::Variable
+    self.rp = Runify::RubyParse.new
+    self.v = Runify::Pattern::Variable
   end
 
   it "should handle ruby syntax pattern matching." do

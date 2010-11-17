@@ -1,70 +1,35 @@
-require 'ruby_unify/pattern/p'
+# gem 'ruby-debug'; require 'ruby-debug'
 
-describe "RubyUnify::Pattern::P" do
-  before(:all) do 
-    RubyUnify::Pattern::P.activate!
+require 'runify/pattern/p'
+
+describe "Runify::Pattern::P" do
+  before(:each) do
+    extend Runify::Pattern::P::Helper
   end
 
-  after(:all) do
-  end
-  
-  it "should handle p in case when statements." do
-    case nil
-    when p(nil)
-      r = :nil
-    else
-      r =:else
-    end
-    r.should == :nil
-    
-    case :x
-    when p(nil)
-      r = :nil
-    else
-      r = :else
-    end
-    r.should == :else
-    
-    case :x
-    when p(:x)
-      r = :x
-    else
-      r = :else
-    end
-    r.should == :x
-    
-    case [ :x, :y ]
-    when p(nil)
-      r = :nil
-    when p(5)
-      r = 5
-    when p([ :x, :y ])
-      r = :x_y
-    else
-      r = :else
-    end
-    r.should == :x_y
+  it "should handle p(...) === data expressions." do
+    (rup(nil) === nil).should == true
+    (rup(nil) === :x).should == false
+    (rup(:x) === false).should == false
+    (rup(:x) === :x).should == true
+
+    (rup(nil) === [ :x, :y ]).should == false
+    (rup(:x) === [ :x, :y ]).should == false
+    (rup(5) === [ :x, :y ]).should == false
+    (rup([ :x ]) === [ :x, :y ]).should == false
+    (rup([ :x, :y ]) === [ :x, :y ]).should == true
   end
 
   it "should handle basic variable matching." do
-    case 5
-    when p(v(:x))
-      m.class.should == RubyUnify::Pattern::Result
-      r = m[:x]
-    else
-      r = :else
-    end
-    r.should == 5
+    # extend Runify::Pattern::P::Helper
 
-    case [ :x, :y ]
-    when p([ v(:x), :y ])
-      m.class.should == RubyUnify::Pattern::Result
-      r = m[:x]
-    else
-      r = :else
-    end
-    r.should == :x
+    (rup(ruv(:x)) === 5).should == true
+    rum.class.should == Runify::Pattern::Result
+    rum[:x].should == 5
 
+    (rup([ ruv(:x), :b ]) === [ :a, :b ]).should == true 
+    rum.class.should == Runify::Pattern::Result
+    rum[:x].should == :a
   end
   
   it "should handle basic pattern unification." do    

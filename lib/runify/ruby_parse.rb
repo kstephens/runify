@@ -1,9 +1,9 @@
-require 'ruby_unify/pattern'
+require 'runify/pattern'
 
 gem 'ParseTree'
 require 'parse_tree'
 
-module RubyUnify
+module Runify
   class RubyParse
     attr_accessor :pattern, :unify
 

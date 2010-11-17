@@ -1,12 +1,12 @@
-require 'ruby_unify/pattern'
+require 'runify/pattern'
 
-describe "RubyUnify::Pattern" do
+describe "Runify::Pattern" do
   attr_accessor :pm, :ru, :v
 
   before(:each) do 
-    self.pm = RubyUnify::Pattern.new
-    self.ru = RubyUnify::Unify.new
-    self.v = RubyUnify::Pattern::Variable
+    self.pm = Runify::Pattern.new
+    self.ru = Runify::Unify.new
+    self.v = Runify::Pattern::Variable
  end
 
   it "should handle atomic pattern matching." do

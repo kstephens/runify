@@ -1,10 +1,12 @@
-require 'ruby_unify/pattern'
+require 'runify/pattern'
 
-module RubyUnify
+module Runify
   class Pattern
     class P
       def self.activate!
-        Kernel.send(:include, Helper)
+        Kernel.send(:include, Runify::Pattern::P::Helper)
+        # pp Kernel.instance_methods.sort
+        # raise unless Kernel.respond_to?(:rup)
       end
 
       def initialize pattern
@@ -13,13 +15,13 @@ module RubyUnify
 
       def === data
         @p ||= Pattern.new
-        Thread.current[:'RubyUnify::Pattern::P.result'] = result = @p.match?(data, @pattern)
-        result.match?
+        Thread.current[:'Runify::Pattern::P.result'] = result = @p.match?(data, @pattern)
+        result && result.match?
       end
 
       module Helper
         
-        def p pattern, once = false
+        def rup pattern, once = false
           if once
             key = caller(0).first
             po = @@cache[key] ||= P.new(pattern)
@@ -29,12 +31,12 @@ module RubyUnify
           po
         end
         
-        def v name
+        def ruv name
           Variable[name]
         end
 
-        def m
-          Thread.current[:'RubyUnify::Pattern::P.result']
+        def rum
+          Thread.current[:'Runify::Pattern::P.result']
         end
       end # module
     end # class

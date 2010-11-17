@@ -1,4 +1,4 @@
-module RubyUnify
+module Runify
   class Pattern
     def match?(data, pattern, result = nil)
       result ||= Result.new
