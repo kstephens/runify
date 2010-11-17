@@ -133,6 +133,7 @@ module RubyUnify
       end
 
       def [](x)
+        x = Variable[x] unless Variable === x
         @h[x]
       end
 
