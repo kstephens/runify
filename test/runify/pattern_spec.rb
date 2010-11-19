@@ -1,7 +1,7 @@
 require 'runify/pattern'
 
 describe "Runify::Pattern" do
-  attr_accessor :pm, :ru, :v
+  attr_accessor :pm, :v
 
   before(:each) do 
     self.pm = Runify::Pattern.new
