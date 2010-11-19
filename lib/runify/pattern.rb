@@ -23,6 +23,8 @@ module Runify
           result.capture!(pattern, data)
           # FALL THROUGH
         end
+      when Condition
+        return result.no_match! unless pattern.match?(data)
       else
         unless data.class == pattern.class
           return result.no_match!
