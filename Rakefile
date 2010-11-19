@@ -26,7 +26,7 @@ Spec::Rake::SpecTask.new('test') do |t|
                  '-f', 'nested',
                  # '-H', 'Runify::Pattern',
                  ]
-  t.spec_files = FileList['test/**/*_spec.rb']
+  t.spec_files = FileList['spec/**/*_spec.rb']
   t.rcov = true
   t.rcov_opts = [
                  # '--exclude', 'test', 
