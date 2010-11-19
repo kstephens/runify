@@ -1,4 +1,5 @@
 require 'runify/pattern'
+# gem 'ruby-debug'; require 'ruby-debug'
 
 describe "Runify::Pattern::Variable" do
   attr_accessor :pm, :v
@@ -25,6 +26,26 @@ describe "Runify::Pattern::Variable" do
     m.should_not == nil
     m[v[:x]].should == 5
     m[:x].should == 5
+  end
+
+  it "should handle variable condition matching." do
+    x = v.new(:x) { | d | d.nil? }
+    pm.match?(nil, x).to_ary.should == [ true, { x => nil } ]
+
+    x = v.new(:x) { | d | d }
+    # debugger
+    pm.match?(nil, x).should == false
+    pm.match?(true, x).to_ary.should == [ true, { x => true } ]
+
+    x = v.new(:x) { | d | d > 1 }
+    pm.match?(1, x).should == false
+    pm.match?(2, x).to_ary.should == [ true, { x => 2 } ]
+
+    pm.match?([ 2, 2 ], [ x, x ]).to_ary.should == [ true, { x => 2 } ]
+
+    lambda { pm.match?([ 1, 0 ], x) }.should raise_error(NoMethodError)
+    x = v.new(:x) { | d | Numeric === d && d > 1 }
+    pm.match?([ 1, 0 ], x).should == false
   end
 
 end

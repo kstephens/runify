@@ -13,6 +13,7 @@ module Runify
 
       case pattern
       when Variable
+        return result.no_match! unless pattern.match?(data)
         if result.key?(pattern)
           x = result[pattern]
           unless _equal?(data, x)
@@ -20,6 +21,7 @@ module Runify
           end
         else
           result.capture!(pattern, data)
+          # FALL THROUGH
         end
       else
         unless data.class == pattern.class
@@ -84,16 +86,25 @@ module Runify
     end
 
 
-    class Variable
-      def initialize n, inspect = nil
+    class Condition
+      def initialize n, inspect = nil, &block
         @name = n
         @inspect = inspect && inspect.freeze
+        @condition = block_given? && block
       end
 
+      def match? value
+        @condition ? @condition.call(value) : true
+      end
+    end
+
+
+    class Variable < Condition
       @@instances = { }
 
       def self.[](n)
         n = n.to_sym
+        raise ArgumentError, "block given" if block_given?
         @@instances[n] ||=
           new(n, "#{self.name}[#{n.inspect}]")
       end
