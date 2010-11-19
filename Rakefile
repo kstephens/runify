@@ -17,7 +17,6 @@ rescue LoadError
   puts "Jeweler, or one of its dependencies, is not available. Install it with: sudo gem install jeweler -s http://gems.github.com"
 end
 
-require 'rake'
 require 'spec/rake/spectask'
 
 desc "Run all tests with RCov"

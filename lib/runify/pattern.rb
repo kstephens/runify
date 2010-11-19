@@ -1,3 +1,5 @@
+require 'runify'
+
 module Runify
   class Pattern
     def match?(data, pattern, result = nil)
@@ -89,9 +91,10 @@ module Runify
 
 
     class Condition
-      def initialize n, inspect = nil, &block
+      def initialize n, opts = nil, &block
+        opts ||= EMPTY_Hash
         @name = n
-        @inspect = inspect && inspect.freeze
+        @inspect = (inspect = opts[:inspect]) && inspect.freeze
         @condition = block_given? && block
       end
 
@@ -108,7 +111,7 @@ module Runify
         n = n.to_sym
         raise ArgumentError, "block given" if block_given?
         @@instances[n] ||=
-          new(n, "#{self.name}[#{n.inspect}]")
+          new(n, :inspect => "#{self.name}[#{n.inspect}]")
       end
 
       def inspect
