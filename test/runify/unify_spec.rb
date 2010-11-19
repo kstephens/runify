@@ -1,6 +1,6 @@
 require 'runify/unify'
 
-describe "Runify::Pattern" do
+describe "Runify::Unify" do
   attr_accessor :pm, :v, :ru
 
   before(:each) do 

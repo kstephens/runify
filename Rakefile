@@ -22,6 +22,10 @@ require 'spec/rake/spectask'
 
 desc "Run all tests with RCov"
 Spec::Rake::SpecTask.new('test') do |t|
+  t.spec_opts = [
+                 '-f', 'nested',
+                 # '-H', 'Runify::Pattern',
+                 ]
   t.spec_files = FileList['test/**/*_spec.rb']
   t.rcov = true
   t.rcov_opts = [
