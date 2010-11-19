@@ -73,5 +73,26 @@ describe "Runify::Pattern::Variable" do
     pm.match?([ 1, 0 ], x).should == false
   end
 
+  it "should handle :rest Variable matching in Arrays." do  
+    x = v.new(:x, :rest => true)
+    pm.match?([ ], [ x ]).to_ary.should == [ true, { x => [ ] } ]
+    pm.match?([ 1 ], [ x ]).to_ary.should == [ true, { x => [ 1 ] } ]
+    pm.match?([ 1, 2 ], [ x ]).to_ary.should == [ true, { x => [ 1, 2 ] } ]
+    pm.match?([ 1, 2, 3 ], [ x ]).to_ary.should == [ true, { x => [ 1, 2, 3 ] } ]
+
+    pm.match?([ ], [ 1, x ]).should == false
+    pm.match?([ 1 ], [ 1, x ]).to_ary.should == [ true, { x => [ ] } ]
+    pm.match?([ 1, 2 ], [ 1, x ]).to_ary.should == [ true, { x => [ 2 ] } ]
+    pm.match?([ 1, 2, 3 ], [ 1, x ]).to_ary.should == [ true, { x => [ 2, 3 ] } ] 
+  end
+
+  it "should handle :rest Variable matching in Arrays with equal captures." do  
+    x = v.new(:x, :rest => true)
+    pm.match?([ [ 1, 2 ], [ 0, 1, 2 ] ], [ [ x ], [ 0, x ] ]).to_ary.should == [ true, { x => [ 1, 2 ] } ]
+    lambda {
+      pm.match?([ [ 1, 2 ], [ 0, 1, 2 ] ], [ x , [ 0, x ] ])
+    }.should raise_error(Runify::Error, "Rest pattern used at non-tail position.")
+  end
+
 end
 

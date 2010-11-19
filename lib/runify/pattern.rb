@@ -4,14 +4,27 @@ module Runify
   class Pattern
     def match?(data, pattern, result = nil)
       result ||= Result.new
-      _match?(data, pattern, result)
+      _match?(data, pattern, result, nil)
       result = result.match? && result
       # $stderr.puts "  match(#{data.inspect}, #{pattern.inspect}) => #{result.inspect}" if $DEBUG
       result
     end
 
-    def _match?(data, pattern, result)
+    def _match?(data, pattern, result, data_context)
       return unless result.match?
+
+      case pattern
+      when Condition, Variable
+        if pattern.rest?
+          case dc = data_context[1]
+          when Array
+            data = dc[data_context[0] .. -1]
+            data_context[3] = true
+          else
+            raise Error, "cannot use #{pattern.class}.rest with #{dc.class} data"
+          end
+        end
+      end
 
       case pattern
       when Variable
@@ -25,8 +38,10 @@ module Runify
           result.capture!(pattern, data)
           # FALL THROUGH
         end
+
       when Condition
         return result.no_match! unless pattern.match?(data)
+
       else
         unless data.class == pattern.class
           return result.no_match!
@@ -35,21 +50,30 @@ module Runify
         case data
         when Array
           return result if data.object_id == pattern.object_id
+          data_context = [ nil, data, pattern ]
+          pattern.each_with_index do | x, i |
+            data_context[0] = i
+            return result.no_match! unless _match?(data[i], x, result, data_context)
+            if data_context[3] 
+              raise Error, "Rest pattern used at non-tail position." unless i == pattern.size - 1
+              return result
+            end
+          end
           unless data.size == pattern.size
             return result.no_match!
           end
-          data.each_with_index do | x, i |
-            return result.no_match! unless _match?(x, pattern[i], result)
-          end
+
         when Hash
           return result if data.object_id == pattern.object_id
           unless data.size == pattern.size
             return result.no_match!
           end
+          data_context = [ nil, data, pattern ]
           data.each do | xk, xv |
+            data_context[0] = xk
             if pattern.key?(xk)
               yv = pattern[xk]
-              return result.no_match! unless _match?(xv, yv, result)
+              return result.no_match! unless _match?(xv, yv, result, data_context)
             end
           end
         else
@@ -91,10 +115,14 @@ module Runify
 
 
     class Condition
+      attr_reader :rest
+      alias :rest? :rest
+
       def initialize n, opts = nil, &block
         opts ||= EMPTY_Hash
         @name = n
         @inspect = (inspect = opts[:inspect]) && inspect.freeze
+        @rest = opts[:rest]
         @condition = block_given? && block
       end
 
