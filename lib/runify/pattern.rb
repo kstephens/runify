@@ -147,46 +147,5 @@ module Runify
     end
   end
 
-  class Unify
-    attr_accessor :pattern
-
-    def pattern
-      @pattern ||=
-        Pattern.new
-    end
-
-    def match_and_unify data, pat, transform, result = nil
-      result = pattern.match?(data, pat)
-      if result
-        result = [ true, unify(transform, result) ]
-      else
-        result = [ false, data ]
-      end
-      # $stderr.puts "  match_and_unify(#{data.inspect}, #{pat.inspect}, #{transform.inspect}) => #{result.inspect}" if $DEBUG
-      result
-    end
-
-    def unify input, result
-      case input
-      when Array
-        input.map { | x | unify(x, result) }
-      when Hash
-        hash = { }
-        input.each do | k, v | 
-          hash[unify(k, result)] = unify(v, result)
-        end
-        hash
-      else
-        if result.key?(input)
-          result[input]
-        else
-          input
-        end
-      end
-    end
-
-  end
-
 end
-
 

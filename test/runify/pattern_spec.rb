@@ -5,7 +5,6 @@ describe "Runify::Pattern" do
 
   before(:each) do 
     self.pm = Runify::Pattern.new
-    self.ru = Runify::Unify.new
     self.v = Runify::Pattern::Variable
  end
 
@@ -61,12 +60,6 @@ describe "Runify::Pattern" do
     m.should_not == nil
     m[v[:x]].should == 5
     m[:x].should == 5
-  end
-
-  it "should handle basic pattern unification." do    
-    ru.match_and_unify(1, v[:x], [ 2, v[:x]]).to_ary.should == [ true, [ 2, 1 ] ]
-    ru.match_and_unify([ 1, 2 ], [ v[:x], v[:x] ], [ 2, v[:x]]).to_ary.should == [ false, [ 1, 2 ] ]
-    ru.match_and_unify([ 1, 2 ], [ v[:x], v[:y] ], { v[:x] => v[:y], :b => 2 }).to_ary.should == [true, {1=>2, :b=>2}]
   end
 
 end

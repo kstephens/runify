@@ -21,8 +21,6 @@ describe "Runify::Pattern::P" do
   end
 
   it "should handle basic variable matching." do
-    # extend Runify::Pattern::P::Helper
-
     (rup(ruv(:x)) === 5).should == true
     rum.class.should == Runify::Pattern::Result
     rum[:x].should == 5

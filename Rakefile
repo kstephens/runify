@@ -28,4 +28,7 @@ Spec::Rake::SpecTask.new('test') do |t|
                  # '--exclude', 'test', 
                  '--exclude', '/var/lib',
                 ]
+
+task :default => :test
+
 end
